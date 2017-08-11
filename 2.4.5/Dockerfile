@@ -12,27 +12,21 @@ RUN set -x; \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/cache/apt/archives/*
 
-ENV NAME=elasticsearch \
-    VERSION=2.4.5
-
-ENV ES_HOME=/usr/share/$NAME \
-    ES_VOLUME=/$NAME
-
-ENV ES_USER=$NAME \
-    ES_DATA_DIR=$ES_VOLUME/data \
-    ES_LOG_DIR=$ES_VOLUME/logs \
-    ES_JAVA_OPTS="-Xms1g -Xmx1g"
+ENV VERSION=2.4.5 \
+    ES_USER=elasticsearch \
+    ES_HOME=/usr/share/elasticsearch \
+    ES_VOLUME=/elasticsearch \
+    ES_JAVA_OPTS=-Xms512m\ -Xmx512m \
+    ES_LOGGER_LEVEL=INFO
 
 RUN set -x; \
     mkdir -p $ES_HOME \
     && wget -qO- https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${VERSION}/elasticsearch-${VERSION}.tar.gz | tar xvz -C $ES_HOME --strip 1 \
-    && mkdir -p $ES_DATA_DIR \
-    && mkdir -p $ES_LOG_DIR \
+    && mkdir -p $ES_VOLUME/data \
+    && mkdir -p $ES_VOLUME/logs \
     && mkdir -p $ES_HOME/plugins \
-    && mkdir -p $ES_HOME/config/scripts
-
-RUN set -x; \
-    useradd -U -r -s /bin/bash $ES_USER
+    && mkdir -p $ES_HOME/config/scripts \
+    && useradd -U -r -s /bin/bash $ES_USER
 
 EXPOSE 9200
 
